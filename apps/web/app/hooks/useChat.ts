@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import type { Message, Conversation } from "../lib/types";
 import { saveConversation } from "../lib/storage";
+import { estimateCost, type CostEstimate } from "../lib/costs";
 import type { AttachmentPayload } from "../lib/attachment";
 
 function generateId() {
@@ -13,17 +14,33 @@ function generateTitle(content: string): string {
   return content.length > 50 ? content.slice(0, 47) + "..." : content;
 }
 
+const ZERO_COST: CostEstimate = {
+  inputTokens: 0,
+  outputTokens: 0,
+  totalTokens: 0,
+  costUSD: 0,
+  costINR: 0,
+};
+
 export function useChat(model: string, systemPrompt: string, userName: string) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [activeConversationId, setActiveConversationId] = useState<
-    string | null
-  >(null);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [costEstimate, setCostEstimate] = useState<CostEstimate>(ZERO_COST);
   const abortRef = useRef<AbortController | null>(null);
 
   const activeConversation =
     conversations.find((c) => c.id === activeConversationId) ?? null;
+
+  // Recalculate cost whenever active conversation changes
+  const recalcCost = useCallback(
+    (msgs: Message[], modelId: string) => {
+      const estimate = estimateCost(msgs, modelId);
+      setCostEstimate(estimate);
+    },
+    []
+  );
 
   const loadConversations = useCallback((convs: Conversation[]) => {
     setConversations(convs);
@@ -42,13 +59,28 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
     setConversations((prev) => [conv, ...prev]);
     setActiveConversationId(id);
     setError(null);
+    setCostEstimate(ZERO_COST);
     return id;
   }, [model]);
 
   const deleteConv = useCallback((id: string) => {
     setConversations((prev) => prev.filter((c) => c.id !== id));
     setActiveConversationId((prev) => (prev === id ? null : prev));
+    setCostEstimate(ZERO_COST);
   }, []);
+
+  // Update cost when switching conversations
+  const handleSetActiveId = useCallback(
+    (id: string) => {
+      setActiveConversationId(id);
+      setConversations((prev) => {
+        const conv = prev.find((c) => c.id === id);
+        if (conv) recalcCost(conv.messages, conv.model);
+        return prev;
+      });
+    },
+    [recalcCost]
+  );
 
   const sendMessage = useCallback(
     async (content: string, attachments?: AttachmentPayload[]) => {
@@ -91,13 +123,12 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
           c.id === convId
             ? {
                 ...c,
-                title:
-                  c.messages.length === 0 ? generateTitle(content) : c.title,
+                title: c.messages.length === 0 ? generateTitle(content) : c.title,
                 messages: [...c.messages, userMsg, asstMsg],
                 updatedAt: new Date(),
               }
-            : c,
-        ),
+            : c
+        )
       );
 
       setIsStreaming(true);
@@ -147,11 +178,11 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
                 ? {
                     ...c,
                     messages: c.messages.map((m) =>
-                      m.id === asstId ? { ...m, content: snapshot } : m,
+                      m.id === asstId ? { ...m, content: snapshot } : m
                     ),
                   }
-                : c,
-            ),
+                : c
+            )
           );
         }
 
@@ -161,14 +192,17 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
               ? {
                   ...c,
                   messages: c.messages.map((m) =>
-                    m.id === asstId ? { ...m, content: full } : m,
+                    m.id === asstId ? { ...m, content: full } : m
                   ),
                   updatedAt: new Date(),
                 }
-              : c,
+              : c
           );
           const conv = updated.find((c) => c.id === convId);
-          if (conv) saveConversation(conv);
+          if (conv) {
+            saveConversation(conv);
+            recalcCost(conv.messages, model);
+          }
           return updated;
         });
       } catch (err: unknown) {
@@ -181,18 +215,18 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
               ? {
                   ...c,
                   messages: c.messages.map((m) =>
-                    m.id === asstId ? { ...m, content: "Error: " + msg } : m,
+                    m.id === asstId ? { ...m, content: "Error: " + msg } : m
                   ),
                 }
-              : c,
-          ),
+              : c
+          )
         );
       } finally {
         setIsStreaming(false);
         abortRef.current = null;
       }
     },
-    [activeConversationId, conversations, model, systemPrompt, userName],
+    [activeConversationId, conversations, model, systemPrompt, userName, recalcCost]
   );
 
   const stopStreaming = useCallback(() => {
@@ -206,7 +240,8 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
     activeConversationId,
     isStreaming,
     error,
-    setActiveConversationId,
+    costEstimate,
+    setActiveConversationId: handleSetActiveId,
     loadConversations,
     newConversation,
     deleteConversation: deleteConv,
