@@ -57,12 +57,19 @@ export function Sidebar({
           New Chat
         </button>
 
-        <div className="mt-2">
+        <div className="mt-2 space-y-2">
           <Link
             href="/pricing"
             className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium transition-colors"
           >
             View Pricing
+          </Link>
+          
+          <Link
+            href="/compare"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-sm font-medium transition-all"
+          >
+            ⚡ Compare Models
           </Link>
         </div>
       </div>
