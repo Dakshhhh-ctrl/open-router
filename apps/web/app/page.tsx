@@ -5,7 +5,12 @@ import { Sidebar } from "./components/Sidebar";
 import { ChatArea } from "./components/ChatArea";
 import { SettingsModal } from "./components/SettingsModal";
 import { useChat } from "./hooks/useChat";
-import { getConversations, getSettings, saveSettings, deleteConversation } from "./lib/storage";
+import {
+  getConversations,
+  getSettings,
+  saveSettings,
+  deleteConversation,
+} from "./lib/storage";
 import type { UserSettings } from "./lib/types";
 
 export default function Home() {
@@ -13,7 +18,8 @@ export default function Home() {
     name: "",
     theme: "dark",
     defaultModel: "openai/gpt-4o",
-    systemPrompt: "You are a helpful, knowledgeable, and friendly AI assistant. Be concise but thorough in your responses.",
+    systemPrompt:
+      "You are a helpful, knowledgeable, and friendly AI assistant. Be concise but thorough in your responses.",
   });
   const [selectedModel, setSelectedModel] = useState(settings.defaultModel);
   const [showSettings, setShowSettings] = useState(false);
@@ -76,8 +82,18 @@ export default function Home() {
         onClick={() => setSidebarOpen((v) => !v)}
         className="fixed top-3 left-3 z-30 md:hidden p-2 rounded-lg bg-gray-900 border border-white/10 text-gray-400"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
 
