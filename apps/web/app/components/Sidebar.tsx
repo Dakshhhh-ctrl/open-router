@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { Conversation, UserSettings } from "../lib/types";
 import { AVAILABLE_MODELS } from "../lib/models";
 
@@ -55,6 +56,23 @@ export function Sidebar({
           </svg>
           New Chat
         </button>
+
+        <div className="mt-2">
+          <Link
+            href="/pricing"
+            className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 text-sm font-medium transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-10V4m0 16v-2"
+              />
+            </svg>
+            Pricing
+          </Link>
+        </div>
       </div>
 
       {/* Conversations */}
