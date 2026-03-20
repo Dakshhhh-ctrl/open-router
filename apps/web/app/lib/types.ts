@@ -6,6 +6,7 @@ export interface Message {
   content: string;
   timestamp: Date;
   model?: string;
+  attachments?: import("./attachment").AttachmentPayload[];
 }
 
 export interface Conversation {

@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import type { Message, Conversation } from "../lib/types";
 import { saveConversation } from "../lib/storage";
+import type { AttachmentPayload } from "../lib/attachment";
 
 function generateId() {
   return Math.random().toString(36).slice(2, 11);
@@ -14,12 +15,15 @@ function generateTitle(content: string): string {
 
 export function useChat(model: string, systemPrompt: string, userName: string) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  const activeConversation = conversations.find((c) => c.id === activeConversationId) ?? null;
+  const activeConversation =
+    conversations.find((c) => c.id === activeConversationId) ?? null;
 
   const loadConversations = useCallback((convs: Conversation[]) => {
     setConversations(convs);
@@ -47,7 +51,7 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
   }, []);
 
   const sendMessage = useCallback(
-    async (content: string) => {
+    async (content: string, attachments?: AttachmentPayload[]) => {
       setError(null);
       let convId = activeConversationId;
 
@@ -70,6 +74,7 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
         role: "user",
         content,
         timestamp: new Date(),
+        attachments,
       };
 
       const asstId = generateId();
@@ -86,12 +91,13 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
           c.id === convId
             ? {
                 ...c,
-                title: c.messages.length === 0 ? generateTitle(content) : c.title,
+                title:
+                  c.messages.length === 0 ? generateTitle(content) : c.title,
                 messages: [...c.messages, userMsg, asstMsg],
                 updatedAt: new Date(),
               }
-            : c
-        )
+            : c,
+        ),
       );
 
       setIsStreaming(true);
@@ -99,16 +105,21 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
       abortRef.current = abort;
 
       try {
-        const currentMsgs = conversations
-          .find((c) => c.id === convId)
-          ?.messages.map((m) => ({ role: m.role, content: m.content })) ?? [];
+        const currentMsgs =
+          conversations
+            .find((c) => c.id === convId)
+            ?.messages.map((m) => ({
+              role: m.role,
+              content: m.content,
+              attachments: m.attachments,
+            })) ?? [];
 
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           signal: abort.signal,
           body: JSON.stringify({
-            messages: [...currentMsgs, { role: "user", content }],
+            messages: [...currentMsgs, { role: "user", content, attachments }],
             model,
             systemPrompt,
             userName,
@@ -136,11 +147,11 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
                 ? {
                     ...c,
                     messages: c.messages.map((m) =>
-                      m.id === asstId ? { ...m, content: snapshot } : m
+                      m.id === asstId ? { ...m, content: snapshot } : m,
                     ),
                   }
-                : c
-            )
+                : c,
+            ),
           );
         }
 
@@ -150,11 +161,11 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
               ? {
                   ...c,
                   messages: c.messages.map((m) =>
-                    m.id === asstId ? { ...m, content: full } : m
+                    m.id === asstId ? { ...m, content: full } : m,
                   ),
                   updatedAt: new Date(),
                 }
-              : c
+              : c,
           );
           const conv = updated.find((c) => c.id === convId);
           if (conv) saveConversation(conv);
@@ -170,18 +181,18 @@ export function useChat(model: string, systemPrompt: string, userName: string) {
               ? {
                   ...c,
                   messages: c.messages.map((m) =>
-                    m.id === asstId ? { ...m, content: "Error: " + msg } : m
+                    m.id === asstId ? { ...m, content: "Error: " + msg } : m,
                   ),
                 }
-              : c
-          )
+              : c,
+          ),
         );
       } finally {
         setIsStreaming(false);
         abortRef.current = null;
       }
     },
-    [activeConversationId, conversations, model, systemPrompt, userName]
+    [activeConversationId, conversations, model, systemPrompt, userName],
   );
 
   const stopStreaming = useCallback(() => {

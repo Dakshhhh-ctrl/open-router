@@ -21,13 +21,22 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useVoice } from "../hooks/useVoice";
+import { useFileUpload } from "../hooks/useFileUpload";
 import { VoiceButton, TTSButton } from "./Voicebutton";
+import {
+  UploadButton,
+  AttachmentStrip,
+  HiddenFileInput,
+} from "./FileUploadArea";
 
 // ─── VoiceChatInput ───────────────────────────────────────────────────────────
 
 interface VoiceChatInputProps {
   /** Called when user submits a message (text or voice) */
-  onSubmit: (text: string) => void;
+  onSubmit: (
+    text: string,
+    attachments?: import("../lib/attachment").AttachmentPayload[],
+  ) => void;
   /** Disable input while model is streaming */
   isLoading?: boolean;
   /**
@@ -49,6 +58,23 @@ export function VoiceChatInput({
   const [autoSpeak, setAutoSpeak] = useState(initialAutoSpeak);
   const prevMessageRef = useRef<string | undefined>(undefined);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // File upload hook
+  const {
+    attachments,
+    isDragging,
+    fileInputRef,
+    addFiles,
+    removeAttachment,
+    clearAttachments,
+    openFilePicker,
+    onDragEnter,
+    onDragLeave,
+    onDragOver,
+    onDrop,
+    errors: fileErrors,
+    clearErrors: clearFileErrors,
+  } = useFileUpload();
 
   // ── Wire up voice hook ─────────────────────────────────────────────────────
 
@@ -100,9 +126,25 @@ export function VoiceChatInput({
   const handleSubmit = (text?: string) => {
     const value = (text ?? inputValue).trim();
     if (!value || isLoading) return;
+
+    // Create message with attachments if any
+    const messageData = {
+      text: value,
+      attachments:
+        attachments.length > 0
+          ? attachments.map((a) => ({
+              type: a.type,
+              mime: a.mime,
+              base64: a.base64,
+              name: a.name,
+            }))
+          : undefined,
+    };
+
     stopListening();
-    onSubmit(value);
+    onSubmit(value, messageData.attachments);
     setInputValue("");
+    clearAttachments();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -127,6 +169,22 @@ export function VoiceChatInput({
 
   return (
     <div className="voice-input-wrapper">
+      {/* File errors */}
+      {fileErrors.length > 0 && (
+        <div className="voice-error" role="alert">
+          {fileErrors.map((error, i) => (
+            <div key={i}>{error}</div>
+          ))}
+          <button
+            type="button"
+            onClick={clearFileErrors}
+            className="text-xs underline ml-2"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       {/* Voice error banner */}
       {voiceError && (
         <p className="voice-error" role="alert">
@@ -142,9 +200,16 @@ export function VoiceChatInput({
         </div>
       )}
 
+      {/* Attachments strip */}
+      <AttachmentStrip attachments={attachments} onRemove={removeAttachment} />
+
       {/* Input row */}
       <div
         className={`voice-input-row ${isListening ? "voice-input-row--active" : ""}`}
+        onDragEnter={onDragEnter}
+        onDragLeave={onDragLeave}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
       >
         <textarea
           ref={textareaRef}
@@ -163,6 +228,13 @@ export function VoiceChatInput({
         />
 
         <div className="voice-input-actions">
+          {/* Upload button */}
+          <UploadButton
+            onClick={openFilePicker}
+            disabled={isLoading}
+            hasAttachments={attachments.length > 0}
+          />
+
           {/* Mic button */}
           {isSupported && (
             <VoiceButton
@@ -215,7 +287,9 @@ export function VoiceChatInput({
           <button
             type="button"
             onClick={() => handleSubmit()}
-            disabled={!inputValue.trim() || isLoading}
+            disabled={
+              (!inputValue.trim() && attachments.length === 0) || isLoading
+            }
             aria-label="Send message"
             className="send-btn"
           >
@@ -235,6 +309,9 @@ export function VoiceChatInput({
             </svg>
           </button>
         </div>
+
+        {/* Hidden file input */}
+        <HiddenFileInput inputRef={fileInputRef} onChange={addFiles} />
       </div>
 
       <style>{`
