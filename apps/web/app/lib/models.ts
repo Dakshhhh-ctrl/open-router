@@ -44,7 +44,7 @@ export const AVAILABLE_MODELS: AIModel[] = [
     contextLength: 1000000,
   },
   {
-    id: "meta-llama/llama-3.1-8b-instruct:free",
+    id: "meta-llama/llama-3.1-8b-instruct",
     name: "Llama 3.1 8B",
     provider: "Meta",
     description: "Free open-source model",
@@ -52,7 +52,7 @@ export const AVAILABLE_MODELS: AIModel[] = [
     free: true,
   },
   {
-    id: "mistralai/mistral-7b-instruct:free",
+    id: "mistralai/mistral-7b-instruct",
     name: "Mistral 7B",
     provider: "Mistral",
     description: "Free fast open model",
