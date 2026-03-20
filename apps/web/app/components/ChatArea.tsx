@@ -5,6 +5,7 @@ import type { Conversation } from "../lib/types";
 import { MessageBubble } from "./MessageBubble";
 import { VoiceChatInput } from "./Voicechatinput";
 import { ModelSelector } from "./ModelSelector";
+import { TemplateBar } from "./TemplateBar";
 
 interface ChatAreaProps {
   conversation: Conversation | null;
@@ -16,6 +17,8 @@ interface ChatAreaProps {
   onStop: () => void;
   onModelChange: (id: string) => void;
   onNewChat: () => void;
+  systemPrompt: string;
+  onChangeSystemPrompt: (prompt: string) => void;
 }
 
 export function ChatArea({
@@ -28,6 +31,8 @@ export function ChatArea({
   onStop,
   onModelChange,
   onNewChat,
+  systemPrompt,
+  onChangeSystemPrompt,
 }: ChatAreaProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -40,16 +45,24 @@ export function ChatArea({
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-gray-950/80 backdrop-blur-sm flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <h1 className="text-sm font-medium text-white truncate max-w-xs">
-            {conversation?.title ?? "New Chat"}
-          </h1>
-          {conversation && (
-            <span className="text-xs text-gray-500">
-              {conversation.messages.length} messages
-            </span>
-          )}
+      <div className="flex items-start justify-between gap-4 px-4 py-3 border-b border-white/5 bg-gray-950/80 backdrop-blur-sm flex-shrink-0">
+        <div className="flex flex-col gap-2 min-w-0">
+          <div className="flex items-center gap-3">
+            <h1 className="text-sm font-medium text-white truncate max-w-xs">
+              {conversation?.title ?? "New Chat"}
+            </h1>
+            {conversation && (
+              <span className="text-xs text-gray-500">
+                {conversation.messages.length} messages
+              </span>
+            )}
+          </div>
+
+          <TemplateBar
+            systemPrompt={systemPrompt}
+            onChangeSystemPrompt={onChangeSystemPrompt}
+            containerClassName="mt-0"
+          />
         </div>
         <ModelSelector selectedModel={selectedModel} onSelect={onModelChange} />
       </div>
