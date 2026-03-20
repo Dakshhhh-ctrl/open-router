@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { UserSettings } from "../lib/types";
 import { AVAILABLE_MODELS } from "../lib/models";
+import { TemplateBar } from "./TemplateBar";
 
 interface SettingsModalProps {
   settings: UserSettings;
@@ -12,6 +13,10 @@ interface SettingsModalProps {
 
 export function SettingsModal({ settings, onSave, onClose }: SettingsModalProps) {
   const [draft, setDraft] = useState<UserSettings>({ ...settings });
+
+  const handleSystemPromptChange = (next: string) => {
+    setDraft((prev) => ({ ...prev, systemPrompt: next }));
+  };
 
   const handleSave = () => {
     onSave(draft);
@@ -106,9 +111,10 @@ export function SettingsModal({ settings, onSave, onClose }: SettingsModalProps)
             <label className="block text-sm font-medium text-gray-300 mb-1.5">
               System Prompt
             </label>
+            <TemplateBar value={draft.systemPrompt} onSelect={handleSystemPromptChange} />
             <textarea
               value={draft.systemPrompt}
-              onChange={(e) => setDraft({ ...draft, systemPrompt: e.target.value })}
+              onChange={(e) => handleSystemPromptChange(e.target.value)}
               rows={3}
               className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
               placeholder="Customize how the AI behaves..."
