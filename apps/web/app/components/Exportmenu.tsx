@@ -428,35 +428,30 @@ export function ExportMenu({
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          padding: 7px 12px;
+          padding: 7px 11px;
           font-size: 13px;
           font-weight: 500;
-          border-radius: 8px;
-          border: 1.5px solid #e5e7eb;
-          background: #fff;
-          color: #374151;
+          font-family: "DM Sans", system-ui, sans-serif;
+          border-radius: 9px;
+          border: 1px solid rgba(255,255,255,0.1);
+          background: rgba(255,255,255,0.05);
+          color: #94a3b8;
           cursor: pointer;
-          transition: background 0.15s, border-color 0.15s;
+          transition: background 0.15s, border-color 0.15s, color 0.15s;
           white-space: nowrap;
         }
-        .dark .export-trigger {
-          background: #1f2937;
-          border-color: #374151;
-          color: #d1d5db;
-        }
         .export-trigger:hover:not(:disabled) {
-          background: #f9fafb;
-          border-color: #d1d5db;
-        }
-        .dark .export-trigger:hover:not(:disabled) {
-          background: #374151;
+          background: rgba(255,255,255,0.09);
+          border-color: rgba(255,255,255,0.18);
+          color: #e2e8f0;
         }
         .export-trigger--open {
-          border-color: #6366f1;
-          box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+          border-color: rgba(99,102,241,0.6);
+          color: #e2e8f0;
+          background: rgba(99,102,241,0.1);
         }
         .export-trigger:disabled {
-          opacity: 0.4;
+          opacity: 0.35;
           cursor: not-allowed;
         }
         .export-menu {
@@ -464,10 +459,10 @@ export function ExportMenu({
           right: 0;
           z-index: 50;
           min-width: 240px;
-          background: #fff;
-          border: 1.5px solid #e5e7eb;
-          border-radius: 12px;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+          background: #0d1526;
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 13px;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03) inset;
           padding: 6px;
           animation: exportMenuIn 0.12s ease;
         }
@@ -484,12 +479,11 @@ export function ExportMenu({
         }
         .export-menu__header {
           font-size: 11px;
-          color: #9ca3af;
+          color: #475569;
           padding: 4px 10px 8px;
-          border-bottom: 1px solid #f3f4f6;
+          border-bottom: 1px solid rgba(255,255,255,0.06);
           margin-bottom: 4px;
         }
-        .dark .export-menu__header { border-color: #374151; }
         .export-menu__item {
           display: flex;
           align-items: center;
@@ -503,8 +497,7 @@ export function ExportMenu({
           cursor: pointer;
           transition: background 0.12s;
         }
-        .export-menu__item:hover:not(:disabled) { background: #f9fafb; }
-        .dark .export-menu__item:hover:not(:disabled) { background: #374151; }
+        .export-menu__item:hover:not(:disabled) { background: rgba(255,255,255,0.06); }
         .export-menu__item:disabled { opacity: 0.5; cursor: wait; }
         .export-menu__icon {
           display: flex;
@@ -515,12 +508,9 @@ export function ExportMenu({
           border-radius: 8px;
           flex-shrink: 0;
         }
-        .export-menu__icon--green { background: #dcfce7; color: #16a34a; }
-        .export-menu__icon--blue  { background: #dbeafe; color: #2563eb; }
-        .export-menu__icon--red   { background: #fee2e2; color: #dc2626; }
-        .dark .export-menu__icon--green { background: #052e16; color: #4ade80; }
-        .dark .export-menu__icon--blue  { background: #1e3a5f; color: #60a5fa; }
-        .dark .export-menu__icon--red   { background: #450a0a; color: #f87171; }
+        .export-menu__icon--green { background: rgba(16,163,127,0.15); color: #10a37f; }
+        .export-menu__icon--blue  { background: rgba(59,130,246,0.15);  color: #60a5fa; }
+        .export-menu__icon--red   { background: rgba(239,68,68,0.15);   color: #f87171; }
         .export-menu__text {
           display: flex;
           flex-direction: column;
@@ -529,12 +519,12 @@ export function ExportMenu({
         .export-menu__label {
           font-size: 13px;
           font-weight: 500;
-          color: #111827;
+          font-family: "DM Sans", system-ui, sans-serif;
+          color: #e2e8f0;
         }
-        .dark .export-menu__label { color: #f9fafb; }
         .export-menu__desc {
           font-size: 11px;
-          color: #9ca3af;
+          color: #475569;
         }
       `}</style>
     </div>

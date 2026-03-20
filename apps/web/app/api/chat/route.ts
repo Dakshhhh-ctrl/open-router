@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import { AttachmentPayload } from "../../lib/attachment";
+import { AttachmentPayload, modelSupportsVision } from "../../lib/attachment";
 
 // ─── OpenRouter client ────────────────────────────────────────────────────────
 
@@ -111,6 +111,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check if any message has attachments and if the model supports vision
+    const hasAttachments = messages.some(
+      (msg) => msg.attachments && msg.attachments.length > 0,
+    );
+    if (hasAttachments && !modelSupportsVision(model)) {
+      return NextResponse.json(
+        {
+          error: `Model ${model} does not support image input. Please use a vision-capable model like GPT-4o, Claude, or Gemini.`,
+        },
+        { status: 400 },
+      );
+    }
+
     // Build the full message array for OpenRouter
     const openrouterMessages: OpenAI.ChatCompletionMessageParam[] = [];
 
@@ -135,42 +148,73 @@ export async function POST(req: NextRequest) {
     }
 
     // Streaming request to OpenRouter
-    const stream = await openrouter.chat.completions.create({
-      model,
-      messages: openrouterMessages,
-      stream: true,
-      max_tokens: 4096,
-    });
+    try {
+      const stream = await openrouter.chat.completions.create({
+        model,
+        messages: openrouterMessages,
+        stream: true,
+        max_tokens: 4096,
+      });
 
-    // Pipe the stream back to the client
-    const encoder = new TextEncoder();
+      // Pipe the stream back to the client
+      const encoder = new TextEncoder();
 
-    const readableStream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of stream) {
-            const delta = chunk.choices[0]?.delta?.content ?? "";
-            if (delta) {
-              controller.enqueue(encoder.encode(delta));
+      const readableStream = new ReadableStream({
+        async start(controller) {
+          try {
+            for await (const chunk of stream) {
+              const delta = chunk.choices[0]?.delta?.content ?? "";
+              if (delta) {
+                controller.enqueue(encoder.encode(delta));
+              }
+              // Signal end
+              if (chunk.choices[0]?.finish_reason) {
+                controller.close();
+              }
             }
-            // Signal end
-            if (chunk.choices[0]?.finish_reason) {
-              controller.close();
-            }
+          } catch (err) {
+            controller.error(err);
           }
-        } catch (err) {
-          controller.error(err);
-        }
-      },
-    });
+        },
+      });
 
-    return new NextResponse(readableStream, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Transfer-Encoding": "chunked",
-        "X-Accel-Buffering": "no",
-      },
-    });
+      return new NextResponse(readableStream, {
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Transfer-Encoding": "chunked",
+          "X-Accel-Buffering": "no",
+        },
+      });
+    } catch (openrouterError: unknown) {
+      console.error("[/api/chat] OpenRouter Error:", openrouterError);
+      const message =
+        openrouterError instanceof Error
+          ? openrouterError.message
+          : "OpenRouter API error";
+
+      // Provide more helpful error messages for common issues
+      if (message.includes("404") || message.includes("No endpoints found")) {
+        return NextResponse.json(
+          {
+            error:
+              "Model not found or doesn't support the requested features. Try a different model.",
+          },
+          { status: 400 },
+        );
+      }
+
+      if (message.includes("401") || message.includes("Unauthorized")) {
+        return NextResponse.json(
+          {
+            error:
+              "Invalid API key. Please check your OpenRouter API key configuration.",
+          },
+          { status: 401 },
+        );
+      }
+
+      return NextResponse.json({ error: message }, { status: 500 });
+    }
   } catch (err: unknown) {
     console.error("[/api/chat] Error:", err);
     const message =

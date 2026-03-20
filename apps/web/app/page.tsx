@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { ChatArea } from "./components/ChatArea";
+import { ChatHeader } from "./components/Chatheader";
 import { SettingsModal } from "./components/SettingsModal";
 import { useChat } from "./hooks/useChat";
 import {
@@ -32,7 +33,7 @@ export default function Home() {
     activeConversationId,
     isStreaming,
     error,
-    costEstimate,           // ← new
+    costEstimate, // ← new
     setActiveConversationId,
     loadConversations,
     newConversation,
@@ -88,8 +89,18 @@ export default function Home() {
         onClick={() => setSidebarOpen((v) => !v)}
         className="fixed top-3 left-3 z-30 md:hidden p-2 rounded-lg bg-gray-900 border border-white/10 text-gray-400"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
         </svg>
       </button>
 
@@ -103,8 +114,14 @@ export default function Home() {
           conversations={conversations}
           activeId={activeConversationId}
           settings={settings}
-          onSelect={(id) => { setActiveConversationId(id); setSidebarOpen(false); }}
-          onNew={() => { newConversation(); setSidebarOpen(false); }}
+          onSelect={(id) => {
+            setActiveConversationId(id);
+            setSidebarOpen(false);
+          }}
+          onNew={() => {
+            newConversation();
+            setSidebarOpen(false);
+          }}
           onDelete={handleDeleteConversation}
           onOpenSettings={() => setShowSettings(true)}
         />
@@ -118,21 +135,43 @@ export default function Home() {
         />
       )}
 
-      {/* Main chat — pass costEstimate down */}
-      <ChatArea
-        conversation={activeConversation}
-        selectedModel={selectedModel}
-        userName={settings.name}
-        systemPrompt={settings.systemPrompt}
-        onChangeSystemPrompt={handleChangeSystemPrompt}
-        isStreaming={isStreaming}
-        error={error}
-        costEstimate={costEstimate}
-        onSend={sendMessage}
-        onStop={stopStreaming}
-        onModelChange={setSelectedModel}
-        onNewChat={newConversation}
-      />
+      {/* Main chat area */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden">
+        {/* Chat Header */}
+        <ChatHeader
+          selectedModelId={selectedModel}
+          onModelChange={setSelectedModel}
+          onPresetClick={(preset) => {
+            // Handle preset clicks - you can customize this logic
+            console.log("Preset clicked:", preset);
+          }}
+          messages={
+            activeConversation?.messages
+              .filter((msg) => msg.role !== "system")
+              .map((msg) => ({
+                role: msg.role as "user" | "assistant",
+                content: msg.content,
+                timestamp: msg.timestamp.getTime(),
+              })) || []
+          }
+        />
+
+        {/* Chat Area */}
+        <ChatArea
+          conversation={activeConversation}
+          selectedModel={selectedModel}
+          userName={settings.name}
+          systemPrompt={settings.systemPrompt}
+          onChangeSystemPrompt={handleChangeSystemPrompt}
+          isStreaming={isStreaming}
+          error={error}
+          costEstimate={costEstimate}
+          onSend={sendMessage}
+          onStop={stopStreaming}
+          onModelChange={setSelectedModel}
+          onNewChat={newConversation}
+        />
+      </div>
 
       {showSettings && (
         <SettingsModal
