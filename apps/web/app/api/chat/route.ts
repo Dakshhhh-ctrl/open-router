@@ -9,7 +9,7 @@ const openrouter = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY!,
   defaultHeaders: {
     "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-    "X-Title": "OpenRouter Chat",
+    "X-Title": "OpenRouter",
   },
 });
 

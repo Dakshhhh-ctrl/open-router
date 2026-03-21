@@ -15,7 +15,8 @@ export default function PricingPage() {
 
   const proPrice = useMemo(() => {
     const base = 499;
-    if (cycle === "monthly") return { monthlyEquivalent: base, billed: "billed monthly" };
+    if (cycle === "monthly")
+      return { monthlyEquivalent: base, billed: "billed monthly" };
     return {
       monthlyEquivalent: Math.round(base * annualDiscountMultiplier),
       billed: "billed annually",
@@ -24,7 +25,8 @@ export default function PricingPage() {
 
   const teamPrice = useMemo(() => {
     const base = 1999;
-    if (cycle === "monthly") return { monthlyEquivalent: base, billed: "billed monthly" };
+    if (cycle === "monthly")
+      return { monthlyEquivalent: base, billed: "billed monthly" };
     return {
       monthlyEquivalent: Math.round(base * annualDiscountMultiplier),
       billed: "billed annually",
@@ -40,7 +42,7 @@ export default function PricingPage() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
-              Simple pricing for OpenRouter Chat
+              Simple pricing for OpenRouter
             </h1>
             <p className="mt-2 text-sm text-gray-400">
               Choose Free now, upgrade when you need more.
@@ -51,8 +53,18 @@ export default function PricingPage() {
             href="/"
             className="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm text-gray-200 transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to chat
           </Link>
@@ -64,7 +76,9 @@ export default function PricingPage() {
               type="button"
               onClick={() => setCycle("monthly")}
               className={`px-4 py-2 text-sm rounded-lg transition-colors ${
-                cycle === "monthly" ? "bg-white/10 text-white" : "text-gray-400 hover:text-gray-200"
+                cycle === "monthly"
+                  ? "bg-white/10 text-white"
+                  : "text-gray-400 hover:text-gray-200"
               }`}
             >
               Monthly
@@ -73,7 +87,9 @@ export default function PricingPage() {
               type="button"
               onClick={() => setCycle("annual")}
               className={`px-4 py-2 text-sm rounded-lg transition-colors ${
-                cycle === "annual" ? "bg-white/10 text-white" : "text-gray-400 hover:text-gray-200"
+                cycle === "annual"
+                  ? "bg-white/10 text-white"
+                  : "text-gray-400 hover:text-gray-200"
               }`}
             >
               Annual <span className="text-indigo-300 font-medium">-20%</span>
@@ -97,24 +113,54 @@ export default function PricingPage() {
             <ul className="mt-6 space-y-3 text-sm text-gray-200">
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded bg-emerald-500/15 text-emerald-300">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </span>
                 3 models
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded bg-emerald-500/15 text-emerald-300">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </span>
                 20 messages/day
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded bg-emerald-500/15 text-emerald-300">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </span>
                 No export
@@ -134,7 +180,9 @@ export default function PricingPage() {
             <div className="relative rounded-2xl bg-gray-950/40 border border-white/10 p-7 -mx-7 -mb-7 -mt-7">
               <div className="flex items-center justify-between">
                 <div className="text-white font-medium">Pro</div>
-                <div className="text-xs text-indigo-300 font-medium">Most popular</div>
+                <div className="text-xs text-indigo-300 font-medium">
+                  Most popular
+                </div>
               </div>
 
               <div className="mt-5 flex items-end gap-2">
@@ -143,29 +191,61 @@ export default function PricingPage() {
                 </div>
                 <div className="pb-1 text-sm text-gray-400">/mo</div>
               </div>
-              <div className="mt-1 text-xs text-gray-400">{proPrice.billed}</div>
+              <div className="mt-1 text-xs text-gray-400">
+                {proPrice.billed}
+              </div>
 
               <ul className="mt-6 space-y-3 text-sm text-gray-200">
                 <li className="flex items-start gap-3">
                   <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded bg-indigo-500/20 text-indigo-200">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </span>
                   All 400+ models
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded bg-indigo-500/20 text-indigo-200">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </span>
                   Unlimited usage
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded bg-indigo-500/20 text-indigo-200">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </span>
                   PDF export + compare mode
@@ -203,24 +283,54 @@ export default function PricingPage() {
             <ul className="mt-6 space-y-3 text-sm text-gray-200">
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded bg-indigo-500/20 text-indigo-200">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </span>
                 Everything in Pro
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded bg-indigo-500/20 text-indigo-200">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </span>
                 API access
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded bg-indigo-500/20 text-indigo-200">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </span>
                 Priority support
@@ -241,10 +351,10 @@ export default function PricingPage() {
         </div>
 
         <div className="mt-10 text-xs text-gray-500">
-          Prices are examples for this demo UI. Wire them to your billing provider when ready.
+          Prices are examples for this demo UI. Wire them to your billing
+          provider when ready.
         </div>
       </div>
     </div>
   );
 }
-

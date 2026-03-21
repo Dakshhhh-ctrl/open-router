@@ -39,7 +39,12 @@ export function Sidebar({
     }
   };
 
-  const navLink = (href: string, label: string, emoji: string, accent?: boolean) => {
+  const navLink = (
+    href: string,
+    label: string,
+    emoji: string,
+    accent?: boolean,
+  ) => {
     const isActive = pathname === href;
     return (
       <Link
@@ -48,8 +53,8 @@ export function Sidebar({
           accent
             ? "bg-gradient-to-r from-purple-600/80 to-indigo-600/80 hover:from-purple-600 hover:to-indigo-600 text-white border border-white/10"
             : isActive
-            ? "bg-white/10 text-white border border-white/10"
-            : "bg-white/5 hover:bg-white/8 text-gray-300 hover:text-white border border-white/5 hover:border-white/10"
+              ? "bg-white/10 text-white border border-white/10"
+              : "bg-white/5 hover:bg-white/8 text-gray-300 hover:text-white border border-white/5 hover:border-white/10"
         }`}
       >
         <span className="text-base leading-none">{emoji}</span>
@@ -63,11 +68,20 @@ export function Sidebar({
       {/* Logo */}
       <div className="px-3 pt-4 pb-3 border-b border-white/5">
         <div className="flex items-center gap-2 px-1 mb-3">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-xs font-bold">OR</span>
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 100 78"
+              fill="white"
+              className="w-5 h-5"
+            >
+              <path d="M72 0 L100 16 L72 32 L72 24 C60 24,42 22,28 38 C16 30,10 28,8 28 L8 18 C16 18,30 16,48 8 C58 3,66 0,72 0 Z" />
+              <path d="M72 78 L100 62 L72 46 L72 54 C60 54,42 56,28 40 C16 48,10 50,8 50 L8 60 C16 60,30 62,48 70 C58 75,66 78,72 78 Z" />
+              <path d="M8 28 C10 28,16 30,28 38 C16 48,10 50,8 50 L0 39 Z" />
+            </svg>
           </div>
           <span className="text-white font-semibold text-sm tracking-tight">
-            OpenRouter Chat
+            OpenRouter
           </span>
         </div>
 
@@ -76,8 +90,18 @@ export function Sidebar({
           onClick={onNew}
           className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors mb-2"
         >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          <svg
+            className="w-3.5 h-3.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
           </svg>
           New Chat
         </button>
@@ -99,7 +123,8 @@ export function Sidebar({
         {conversations.length === 0 ? (
           <p className="text-gray-600 text-xs text-center mt-8 px-3 leading-relaxed">
             No conversations yet.
-            <br />Start a new chat above.
+            <br />
+            Start a new chat above.
           </p>
         ) : (
           conversations.map((conv) => (
@@ -126,25 +151,30 @@ export function Sidebar({
                 />
               </svg>
               <span className="flex-1 truncate text-xs">{conv.title}</span>
-                <button
-                  onClick={(e) => handleDelete(e, conv.id)}
-                  className={`opacity-0 group-hover:opacity-100 p-0.5 rounded transition-all ${
-                    deleteConfirm === conv.id
-                      ? "text-red-400 opacity-100"
-                      : "text-gray-600 hover:text-red-400"
-                  }`}
+              <button
+                onClick={(e) => handleDelete(e, conv.id)}
+                className={`opacity-0 group-hover:opacity-100 p-0.5 rounded transition-all ${
+                  deleteConfirm === conv.id
+                    ? "text-red-400 opacity-100"
+                    : "text-gray-600 hover:text-red-400"
+                }`}
+              >
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                </button>
-              </div>
-            ))
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </button>
+            </div>
+          ))
         )}
       </div>
 

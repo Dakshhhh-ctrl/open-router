@@ -9,7 +9,7 @@ const openrouter = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY!,
   defaultHeaders: {
     "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-    "X-Title": "OpenRouter Chat",
+    "X-Title": "OpenRouter",
   },
 });
 
@@ -154,29 +154,40 @@ export async function POST(req: NextRequest) {
     // Start all model streams simultaneously
     const modelPromises = models.map(async (model, index) => {
       try {
-        const modelStream = await createModelStream(model, prompt, systemPrompt, attachments);
-        
+        const modelStream = await createModelStream(
+          model,
+          prompt,
+          systemPrompt,
+          attachments,
+        );
+
         for await (const chunk of modelStream) {
           // Prefix each chunk with model index for multiplexing
           await writer.write(encoder.encode(`${index}:${chunk}`));
         }
-        
+
         // Signal completion for this model
         await writer.write(encoder.encode(`${index}:[DONE]`));
       } catch (error) {
         console.error(`Error streaming model ${model}:`, error);
         // Send error message for this model
-        await writer.write(encoder.encode(`${index}:[ERROR]${error instanceof Error ? error.message : 'Unknown error'}`));
+        await writer.write(
+          encoder.encode(
+            `${index}:[ERROR]${error instanceof Error ? error.message : "Unknown error"}`,
+          ),
+        );
       }
     });
 
     // Close stream when all models are done
-    Promise.all(modelPromises).then(() => {
-      writer.close();
-    }).catch((error) => {
-      console.error('Error in model streaming:', error);
-      writer.close();
-    });
+    Promise.all(modelPromises)
+      .then(() => {
+        writer.close();
+      })
+      .catch((error) => {
+        console.error("Error in model streaming:", error);
+        writer.close();
+      });
 
     return new NextResponse(transformStream.readable, {
       headers: {
@@ -184,7 +195,7 @@ export async function POST(req: NextRequest) {
         "Transfer-Encoding": "chunked",
         "X-Accel-Buffering": "no",
         "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
+        Connection: "keep-alive",
       },
     });
   } catch (err: unknown) {
