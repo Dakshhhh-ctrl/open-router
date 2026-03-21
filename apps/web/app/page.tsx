@@ -6,6 +6,7 @@ import { ChatArea } from "./components/ChatArea";
 import { ChatHeader } from "./components/Chatheader";
 import { SettingsModal } from "./components/SettingsModal";
 import { useChat } from "./hooks/useChat";
+import { HunterOSLogo } from "./components/HunterOSLogo";
 import {
   getConversations,
   getSettings,
@@ -75,8 +76,7 @@ export default function Home() {
     return (
       <div className="flex h-full items-center justify-center bg-gray-950">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 animate-pulse" />
-          <p className="text-gray-500 text-sm">Loading...</p>
+          <HunterOSLogo size={40} showText={true} className="opacity-60 animate-pulse" />
         </div>
       </div>
     );

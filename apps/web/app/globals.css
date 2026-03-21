@@ -6,6 +6,17 @@
   --font-geist-sans: ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-geist-mono: ui-monospace, "Cascadia Code", monospace;
   --sidebar-width: 220px;
+  --fd-bg: #0e0d09;
+  --fd-surface: #161510;
+  --fd-surface-2: #1e1c16;
+  --fd-border: rgba(255, 248, 220, 0.07);
+  --fd-green: #4a7c59;
+  --fd-green-hover: #5a9469;
+  --fd-green-dim: rgba(74, 124, 89, 0.15);
+  --fd-green-text: #7ec89a;
+  --fd-text-1: #f5f0e8;
+  --fd-text-2: #9e9880;
+  --fd-text-3: #5c5847;
 }
 
 * { box-sizing: border-box; }
@@ -17,8 +28,8 @@ html, body {
 }
 
 body {
-  background-color: #030712;
-  color: #f9fafb;
+  background-color: #0e0d09;
+  color: #f5f0e8;
   font-family: var(--font-geist-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

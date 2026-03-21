@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Conversation, UserSettings } from "../lib/types";
 import { AVAILABLE_MODELS } from "../lib/models";
+import { HunterOSLogo } from "./HunterOSLogo";
 
 interface SidebarProps {
   conversations: Conversation[];
@@ -68,21 +69,7 @@ export function Sidebar({
       {/* Logo */}
       <div className="px-3 pt-4 pb-3 border-b border-white/5">
         <div className="flex items-center gap-2 px-1 mb-3">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 100 78"
-              fill="white"
-              className="w-5 h-5"
-            >
-              <path d="M72 0 L100 16 L72 32 L72 24 C60 24,42 22,28 38 C16 30,10 28,8 28 L8 18 C16 18,30 16,48 8 C58 3,66 0,72 0 Z" />
-              <path d="M72 78 L100 62 L72 46 L72 54 C60 54,42 56,28 40 C16 48,10 50,8 50 L8 60 C16 60,30 62,48 70 C58 75,66 78,72 78 Z" />
-              <path d="M8 28 C10 28,16 30,28 38 C16 48,10 50,8 50 L0 39 Z" />
-            </svg>
-          </div>
-          <span className="text-white font-semibold text-sm tracking-tight">
-            OpenRouter
-          </span>
+          <HunterOSLogo size={28} showText={true} />
         </div>
 
         {/* New chat */}
@@ -109,6 +96,7 @@ export function Sidebar({
         {/* Nav links */}
         <div className="flex flex-col gap-1.5">
           {navLink("/compare", "Compare Models", "⚡", true)}
+          {navLink("/bounty", "Bounty Tools", "🎯")}
           {navLink("/pricing", "Pricing", "$")}
         </div>
       </div>

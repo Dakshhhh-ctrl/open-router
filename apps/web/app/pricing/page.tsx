@@ -42,7 +42,7 @@ export default function PricingPage() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
-              Simple pricing for OpenRouter
+              Simple pricing for HunterOS
             </h1>
             <p className="mt-2 text-sm text-gray-400">
               Choose Free now, upgrade when you need more.
@@ -66,7 +66,7 @@ export default function PricingPage() {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Back to chat
+            Back to HunterOS
           </Link>
         </div>
 
@@ -351,8 +351,8 @@ export default function PricingPage() {
         </div>
 
         <div className="mt-10 text-xs text-gray-500">
-          Prices are examples for this demo UI. Wire them to your billing
-          provider when ready.
+          HunterOS · Operating system for bounty hunters ·
+          Powered by OpenRouter
         </div>
       </div>
     </div>

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "OpenRouter",
-  description: "Chat with 400+ AI models via OpenRouter",
+  title: "HunterOS",
+  description: "Operating system for bounty hunters",
 };
 
 export default function RootLayout({

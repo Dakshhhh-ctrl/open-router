@@ -35,7 +35,7 @@ export function CostMeter({ estimate, isStreaming }: CostMeterProps) {
         </span>
       </span>
       <span className="ml-auto text-[10px]">
-        Powered by OpenRouter · 400+ models
+        HunterOS · Powered by OpenRouter
       </span>
     </div>
   );
