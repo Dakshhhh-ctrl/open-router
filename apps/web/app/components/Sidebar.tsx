@@ -98,6 +98,7 @@ export function Sidebar({
           {navLink("/compare", "Compare Models", "⚡", true)}
           {navLink("/bounty", "Bounty Tools", "🎯")}
           {navLink("/benchmark", "Benchmark", "📊")}
+          {navLink("/trust-score", "Trust Score", "🛡️")}
           {navLink("/pricing", "Pricing", "$")}
         </div>
       </div>

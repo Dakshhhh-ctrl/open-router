@@ -76,7 +76,11 @@ export default function Home() {
     return (
       <div className="flex h-full items-center justify-center bg-gray-950">
         <div className="flex flex-col items-center gap-3">
-          <HunterOSLogo size={40} showText={true} className="opacity-60 animate-pulse" />
+          <HunterOSLogo
+            size={40}
+            showText={true}
+            className="opacity-60 animate-pulse"
+          />
         </div>
       </div>
     );
@@ -136,7 +140,7 @@ export default function Home() {
       )}
 
       {/* Main chat area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
+      <div className="flex-1 flex flex-col h-full overflow-y-auto">
         {/* Chat Header */}
         <ChatHeader
           selectedModelId={selectedModel}
