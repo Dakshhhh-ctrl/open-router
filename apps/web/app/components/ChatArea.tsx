@@ -145,8 +145,8 @@ function WelcomeScreen({
         {userName ? `Hello, ${userName}! 👋` : "Hello there! 👋"}
       </h2>
       <p className="text-gray-500 text-sm mb-8 text-center max-w-sm leading-relaxed">
-        HunterOS — chat with 400+ AI models, compare responses,
-        and win more bounties on First Dollar.
+        HunterOS — chat with 400+ AI models, compare responses, and win more
+        bounties on First Dollar.
       </p>
 
       {/* Suggestion cards */}
@@ -167,8 +167,8 @@ function WelcomeScreen({
 
       {/* Hint */}
       <p className="mt-8 text-[11px] text-gray-700">
-        Tip: Use ⚡ Compare in the sidebar to run the same prompt across
-        3 models · Use 🎯 Bounty Tools to win on First Dollar
+        Tip: Use ⚡ Compare in the sidebar to run the same prompt across 3
+        models · Use 🎯 Bounty Tools to win on First Dollar
       </p>
     </div>
   );
