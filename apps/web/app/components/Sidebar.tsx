@@ -97,6 +97,7 @@ export function Sidebar({
         <div className="flex flex-col gap-1.5">
           {navLink("/compare", "Compare Models", "⚡", true)}
           {navLink("/bounty", "Bounty Tools", "🎯")}
+          {navLink("/benchmark", "Benchmark", "📊")}
           {navLink("/pricing", "Pricing", "$")}
         </div>
       </div>
