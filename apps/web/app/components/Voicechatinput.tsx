@@ -124,7 +124,7 @@ export function VoiceChatInput({
 
   return (
     <div className="vic-wrapper">
-      {/* ── ALL CSS — scoped inside .vic-wrapper ── */}
+      {/* ── All CSS scoped under .vic-wrapper so nothing leaks out ── */}
       <style>{`
         .vic-wrapper {
           display: flex;
@@ -136,14 +136,15 @@ export function VoiceChatInput({
           box-sizing: border-box;
         }
 
-        /* Override UploadButton & VoiceButton light-mode hover with dark styles */
+        /* Force dark hover on upload-btn and voice-btn inside toolbar */
         .vic-wrapper .upload-btn:hover:not(:disabled),
         .vic-wrapper .voice-btn:hover:not(:disabled) {
           background: rgba(255,255,255,0.08) !important;
-          color: rgba(255,255,255,0.85) !important;
+          color: rgba(255,255,255,0.9) !important;
         }
 
-        .vic-error {
+        /* Errors */
+        .vic-wrapper .vic-error {
           display: flex;
           align-items: center;
           gap: 6px;
@@ -156,7 +157,7 @@ export function VoiceChatInput({
           width: 100%;
           margin: 0;
         }
-        .vic-error-clear {
+        .vic-wrapper .vic-error-clear {
           font-size: 11px;
           text-decoration: underline;
           background: none;
@@ -167,7 +168,8 @@ export function VoiceChatInput({
           padding: 0;
         }
 
-        .vic-listening-banner {
+        /* Listening banner */
+        .vic-wrapper .vic-listening-banner {
           display: flex;
           align-items: center;
           gap: 8px;
@@ -179,7 +181,7 @@ export function VoiceChatInput({
           border: 1px solid rgba(239,68,68,0.2);
           width: 100%;
         }
-        .vic-dot {
+        .vic-wrapper .vic-dot {
           display: inline-block;
           width: 7px;
           height: 7px;
@@ -193,28 +195,30 @@ export function VoiceChatInput({
           50%       { opacity: 0.4; transform: scale(0.7); }
         }
 
-        .vic-card {
+        /* Input card */
+        .vic-wrapper .vic-card {
           width: 100%;
           border-radius: 16px;
           border: 1px solid rgba(255,255,255,0.09);
           background: rgba(255,255,255,0.04);
           transition: border-color 0.15s, box-shadow 0.15s;
-          overflow: hidden;
+          overflow: visible;
         }
-        .vic-card:focus-within {
+        .vic-wrapper .vic-card:focus-within {
           border-color: rgba(255,255,255,0.18);
           box-shadow: 0 0 0 3px rgba(124,58,237,0.07);
         }
-        .vic-card--listening {
+        .vic-wrapper .vic-card--listening {
           border-color: rgba(239,68,68,0.45) !important;
           box-shadow: 0 0 0 3px rgba(239,68,68,0.06) !important;
         }
-        .vic-card--dragging {
+        .vic-wrapper .vic-card--dragging {
           border-color: rgba(124,58,237,0.5) !important;
           box-shadow: 0 0 0 3px rgba(124,58,237,0.08) !important;
         }
 
-        .vic-textarea {
+        /* Textarea */
+        .vic-wrapper .vic-textarea {
           display: block;
           width: 100%;
           box-sizing: border-box;
@@ -229,67 +233,68 @@ export function VoiceChatInput({
           min-height: 52px;
           max-height: 200px;
           overflow-y: auto;
-          font-family: "DM Sans", system-ui, sans-serif;
+          font-family: inherit;
+          border-radius: 16px 16px 0 0;
         }
-        .vic-textarea::placeholder {
+        .vic-wrapper .vic-textarea::placeholder {
           color: rgba(255,255,255,0.22);
         }
 
-        .vic-divider {
+        /* Divider */
+        .vic-wrapper .vic-divider {
           height: 1px;
           background: rgba(255,255,255,0.06);
           margin: 0 16px;
         }
 
-        .vic-toolbar {
+        /* Toolbar */
+        .vic-wrapper .vic-toolbar {
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 6px 10px;
         }
-        .vic-toolbar-left {
+        .vic-wrapper .vic-toolbar-left {
           display: flex;
           align-items: center;
           gap: 2px;
         }
-        .vic-toolbar-right {
+        .vic-wrapper .vic-toolbar-right {
           display: flex;
           align-items: center;
           flex-shrink: 0;
         }
 
-        /* Share + autospeak icon buttons */
-        .vic-toolbar-btn {
+        /* Auto-speak icon button */
+        .vic-wrapper .vic-icon-btn {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          border: 1.5px solid transparent;
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          border: none;
           background: transparent;
           color: rgba(255,255,255,0.35);
           cursor: pointer;
-          transition: background 0.15s, color 0.15s;
+          transition: background 0.13s, color 0.13s;
           padding: 0;
           flex-shrink: 0;
         }
-        .vic-toolbar-btn:hover {
-          background: rgba(255,255,255,0.08);
-          color: rgba(255,255,255,0.85);
+        .vic-wrapper .vic-icon-btn:hover {
+          background: rgba(255,255,255,0.08) !important;
+          color: rgba(255,255,255,0.9) !important;
         }
-        .vic-toolbar-btn--on {
-          color: #818cf8;
-          background: rgba(99,102,241,0.12);
-          border-color: rgba(99,102,241,0.3);
+        .vic-wrapper .vic-icon-btn--on {
+          color: #818cf8 !important;
+          background: rgba(99,102,241,0.12) !important;
         }
-        .vic-toolbar-btn--on:hover {
+        .vic-wrapper .vic-icon-btn--on:hover {
           background: rgba(99,102,241,0.2) !important;
-          color: #a5b4fc !important;
         }
 
         /* Send button */
-        .vic-send-btn {
+        .vic-wrapper .vic-send-btn {
           display: inline-flex;
           align-items: center;
           gap: 6px;
@@ -305,7 +310,7 @@ export function VoiceChatInput({
           transition: all 0.15s;
           pointer-events: none;
         }
-        .vic-send-btn--active {
+        .vic-wrapper .vic-send-btn--active {
           background: linear-gradient(135deg, #7c3aed, #6d28d9);
           border-color: rgba(124,58,237,0.5);
           color: #fff;
@@ -313,11 +318,11 @@ export function VoiceChatInput({
           pointer-events: auto;
           box-shadow: 0 2px 10px rgba(124,58,237,0.35);
         }
-        .vic-send-btn--active:hover {
+        .vic-wrapper .vic-send-btn--active:hover {
           background: linear-gradient(135deg, #8b5cf6, #7c3aed);
           box-shadow: 0 4px 14px rgba(124,58,237,0.5);
         }
-        .vic-send-btn--active:active {
+        .vic-wrapper .vic-send-btn--active:active {
           transform: scale(0.97);
         }
       `}</style>
@@ -364,7 +369,7 @@ export function VoiceChatInput({
         onDragOver={onDragOver}
         onDrop={onDrop}
       >
-        {/* Full-width textarea */}
+        {/* Textarea — full width */}
         <textarea
           ref={textareaRef}
           value={inputValue}
@@ -387,14 +392,14 @@ export function VoiceChatInput({
         {/* ── TOOLBAR ── */}
         <div className="vic-toolbar">
           <div className="vic-toolbar-left">
-            {/* Attach — existing component, hover overridden via .vic-wrapper scope */}
+            {/* Attach */}
             <UploadButton
               onClick={openFilePicker}
               disabled={isLoading}
               hasAttachments={attachments.length > 0}
             />
 
-            {/* Voice — existing component, hover overridden via .vic-wrapper scope */}
+            {/* Voice */}
             {isSupported && (
               <VoiceButton
                 status={status}
@@ -417,9 +422,9 @@ export function VoiceChatInput({
                 title={
                   autoSpeak
                     ? "Auto-speak on — click to disable"
-                    : "Auto-speak off — click to enable"
+                    : "Auto-speak off"
                 }
-                className={`vic-toolbar-btn${autoSpeak ? " vic-toolbar-btn--on" : ""}`}
+                className={`vic-icon-btn${autoSpeak ? " vic-icon-btn--on" : ""}`}
               >
                 <svg
                   width="16"
@@ -441,32 +446,6 @@ export function VoiceChatInput({
                 </svg>
               </button>
             )}
-
-            {/* Share */}
-            <button
-              type="button"
-              aria-label="Share / Export"
-              title="Share / Export"
-              className="vic-toolbar-btn"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="18" cy="5" r="3" />
-                <circle cx="6" cy="12" r="3" />
-                <circle cx="18" cy="19" r="3" />
-                <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
-                <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
-              </svg>
-            </button>
           </div>
 
           {/* Send */}
