@@ -4,6 +4,7 @@ const nextConfig = {
   devIndicators: false,
   env: {
     OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ?? "",
+    OPENAI_API_KEY: process.env.OPENROUTER_API_KEY ?? "",
   },
 };
 
