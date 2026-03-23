@@ -1,16 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openrouter = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY!,
-  defaultHeaders: {
-    "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-    "X-Title": "OpenRouter Chat",
-  },
-});
-
-async function callLlama(system: string, user: string): Promise<string> {
+async function callLlama(system: string, user: string, openrouter: OpenAI): Promise<string> {
   const response = await openrouter.chat.completions.create({
     model: "meta-llama/llama-3.1-8b-instruct",
     messages: [
@@ -244,6 +235,15 @@ function computeMetrics(results: { expected: string; predicted: string }[]) {
 }
 
 export async function GET(req: NextRequest) {
+  const openrouter = new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: process.env.OPENROUTER_API_KEY!,
+    defaultHeaders: {
+      "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+      "X-Title": "OpenRouter Chat",
+    },
+  });
+
   const { searchParams } = new URL(req.url);
   const feature = searchParams.get("feature") ?? "preflight";
 
@@ -259,7 +259,8 @@ export async function GET(req: NextRequest) {
           `BOUNTY: ${t.bounty.slice(0, 500)}
 OPENING: ${t.submission.slice(0, 200)}
 CLOSING: ${t.submission.slice(-200)}
-Return: {"overall_score":<0-100>,"prediction":"approve" or "reject","confidence":"high"|"medium"|"low","primary_issue":"<one sentence or null>"}`
+Return: {"overall_score":<0-100>,"prediction":"approve" or "reject","confidence":"high"|"medium"|"low","primary_issue":"<one sentence or null>"}`,
+          openrouter
         );
         const ai = safeParse(raw);
         const aiPred =
@@ -299,7 +300,8 @@ Return: {"overall_score":<0-100>,"prediction":"approve" or "reject","confidence"
               personaPrompts[p] as string,
               `BOUNTY: ${t.bounty.slice(0, 500)}
 SUBMISSION: ${t.submission.slice(0, 600)}
-Return: {"score":<0-100>,"verdict":"Approved"|"Needs Work"|"Rejected","strengths":["<s1>"],"issues":["<i1>"],"topSuggestion":"<one sentence>"}`
+Return: {"score":<0-100>,"verdict":"Approved"|"Needs Work"|"Rejected","strengths":["<s1>"],"issues":["<i1>"],"topSuggestion":"<one sentence>"}`,
+              openrouter
             );
             const parsed = safeParse(raw);
             return { persona: p, ...parsed } as PersonaResult;
@@ -329,7 +331,8 @@ Return: {"score":<0-100>,"verdict":"Approved"|"Needs Work"|"Rejected","strengths
           "You diagnose why bounty submissions were rejected. Be specific. Return ONLY valid JSON.",
           `BOUNTY: ${t.bounty.slice(0, 500)}
 REJECTED: ${t.submission.slice(0, 600)}
-Return: {"primaryReason":"<string>","whatWasReallyWanted":"<string>","specificGaps":["<g1>","<g2>","<g3>"],"whatWinnerLikelyDid":"<string>","scoreEstimate":<0-100>,"salvageable":true or false}`
+Return: {"primaryReason":"<string>","whatWasReallyWanted":"<string>","specificGaps":["<g1>","<g2>","<g3>"],"whatWinnerLikelyDid":"<string>","scoreEstimate":<0-100>,"salvageable":true or false}`,
+          openrouter
         );
         const result = safeParse(raw);
         const diagnosed = (

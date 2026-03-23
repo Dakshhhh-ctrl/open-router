@@ -2,19 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { AttachmentPayload, modelSupportsVision } from "../../lib/attachment";
 
-// ─── OpenRouter client ────────────────────────────────────────────────────────
-
-const openrouter = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY!,
-  defaultHeaders: {
-    "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-    "X-Title": "OpenRouter",
-  },
-});
-
-// ─── Types matching what the client sends ────────────────────────────────────
-
 interface IncomingMessage {
   role: "user" | "assistant" | "system";
   content: string;
@@ -100,6 +87,15 @@ function buildContentArray(
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  const openrouter = new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: process.env.OPENROUTER_API_KEY!,
+    defaultHeaders: {
+      "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+      "X-Title": "OpenRouter",
+    },
+  });
+
   try {
     const body: RequestBody = await req.json();
     const { messages, model, systemPrompt } = body;

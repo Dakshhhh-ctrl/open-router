@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openrouter = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY!,
-  defaultHeaders: {
-    "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-    "X-Title": "OpenRouter Chat",
-  },
-});
-
 async function callLlama(
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  openrouter: OpenAI
 ): Promise<string> {
   const response = await openrouter.chat.completions.create({
     model: "meta-llama/llama-3.1-8b-instruct",
@@ -41,7 +33,7 @@ function safeParseJSON(text: string): Record<string, unknown> {
 async function handlePreflight(payload: {
   bounty: string;
   submission: string;
-}) {
+}, openrouter: OpenAI) {
   const { bounty, submission } = payload;
   const safeBounty = bounty ?? "";
   const safeSubmission = submission ?? "";
@@ -59,7 +51,7 @@ Return this exact JSON:
   "closing": { "pass": true or false, "reason": "one sentence why" },
   "overall_impression": "one sentence summary"
 }`;
-  const result = await callLlama(systemPrompt as string, userPrompt as string);
+  const result = await callLlama(systemPrompt as string, userPrompt as string, openrouter);
   return safeParseJSON(result);
 }
 
@@ -81,7 +73,7 @@ async function handlePeerReview(payload: {
   bounty: string;
   submission: string;
   persona: "technical" | "business" | "skeptic";
-}) {
+}, openrouter: OpenAI) {
   const { bounty, submission, persona } = payload;
   const safeBounty = bounty ?? "";
   const safeSubmission = submission ?? "";
@@ -101,7 +93,7 @@ Return this exact JSON:
   "issues": ["<issue 1>", "<issue 2>"],
   "topSuggestion": "<the single most important thing to fix>"
 }`;
-  const result = await callLlama(systemPrompt as string, userPrompt as string);
+  const result = await callLlama(systemPrompt as string, userPrompt as string, openrouter);
   return safeParseJSON(result);
 }
 
@@ -109,7 +101,7 @@ async function handleAutopsy(payload: {
   bounty: string;
   rejected: string;
   winning?: string;
-}) {
+}, openrouter: OpenAI) {
   const { bounty, rejected, winning } = payload;
   const safeBounty = bounty ?? "";
   const safeRejected = rejected ?? "";
@@ -139,11 +131,11 @@ Return this exact JSON:
   "scoreEstimate": <number 0-100>,
   "salvageable": <true or false>
 }`;
-  const result = await callLlama(systemPrompt as string, userPrompt as string);
+  const result = await callLlama(systemPrompt as string, userPrompt as string, openrouter);
   return safeParseJSON(result);
 }
 
-async function handleRecommend(payload: { task: string }) {
+async function handleRecommend(payload: { task: string }, openrouter: OpenAI) {
   const { task } = payload;
   const safeTask = task ?? "";
   const { AVAILABLE_MODELS } = await import("../../lib/models");
@@ -164,11 +156,20 @@ Return this exact JSON:
     { "model": "<model-id>", "reason": "<one sentence>", "strengthScore": <1-10> }
   ]
 }`;
-  const result = await callLlama(systemPrompt as string, userPrompt as string);
+  const result = await callLlama(systemPrompt as string, userPrompt as string, openrouter);
   return safeParseJSON(result);
 }
 
 export async function POST(req: NextRequest) {
+  const openrouter = new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: process.env.OPENROUTER_API_KEY!,
+    defaultHeaders: {
+      "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+      "X-Title": "OpenRouter Chat",
+    },
+  });
+
   try {
     const body = (await req.json()) as {
       feature: string;
@@ -185,7 +186,8 @@ export async function POST(req: NextRequest) {
     switch (feature) {
       case "preflight_ai":
         result = await handlePreflight(
-          payload as { bounty: string; submission: string }
+          payload as { bounty: string; submission: string },
+          openrouter
         );
         break;
       case "peer_review":
@@ -194,16 +196,18 @@ export async function POST(req: NextRequest) {
             bounty: string;
             submission: string;
             persona: "technical" | "business" | "skeptic";
-          }
+          },
+          openrouter
         );
         break;
       case "autopsy":
         result = await handleAutopsy(
-          payload as { bounty: string; rejected: string; winning?: string }
+          payload as { bounty: string; rejected: string; winning?: string },
+          openrouter
         );
         break;
       case "recommend":
-        result = await handleRecommend(payload as { task: string });
+        result = await handleRecommend(payload as { task: string }, openrouter);
         break;
       default:
         return NextResponse.json(

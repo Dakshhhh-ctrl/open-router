@@ -2,16 +2,101 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { AttachmentPayload } from "../../lib/attachment";
 
-// ─── OpenRouter client ────────────────────────────────────────────────────────
+// ─── Route handler ────────────────────────────────────────────────────────────
 
-const openrouter = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY!,
-  defaultHeaders: {
-    "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-    "X-Title": "OpenRouter",
-  },
-});
+export async function POST(req: NextRequest) {
+  const openrouter = new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: process.env.OPENROUTER_API_KEY!,
+    defaultHeaders: {
+      "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+      "X-Title": "OpenRouter",
+    },
+  });
+
+  try {
+    const body: {
+      prompt: string;
+      models: string[];
+      systemPrompt?: string;
+      attachments?: AttachmentPayload[];
+    } = await req.json();
+    const { prompt, models, systemPrompt, attachments } = body;
+
+    if (!prompt?.trim() || !models?.length) {
+      return NextResponse.json(
+        { error: "prompt and models are required" },
+        { status: 400 },
+      );
+    }
+
+    if (models.length > 10) {
+      return NextResponse.json(
+        { error: "maximum 10 models allowed for comparison" },
+        { status: 400 },
+      );
+    }
+
+    // Create multiplexed stream
+    const encoder = new TextEncoder();
+    const transformStream = new TransformStream();
+    const writer = transformStream.writable.getWriter();
+
+    // Start all model streams simultaneously
+    const modelPromises = models.map(async (model, index) => {
+      try {
+        const modelStream = await createModelStream(
+          model,
+          prompt,
+          systemPrompt,
+          attachments,
+          openrouter,
+        );
+
+        for await (const chunk of modelStream) {
+          // Prefix each chunk with model index for multiplexing
+          await writer.write(encoder.encode(`${index}:${chunk}`));
+        }
+
+        // Signal completion for this model
+        await writer.write(encoder.encode(`${index}:[DONE]`));
+      } catch (error) {
+        console.error(`Error streaming model ${model}:`, error);
+        // Send error message for this model
+        await writer.write(
+          encoder.encode(
+            `${index}:[ERROR]${error instanceof Error ? error.message : "Unknown error"}`,
+          ),
+        );
+      }
+    });
+
+    // Close stream when all models are done
+    Promise.all(modelPromises)
+      .then(() => {
+        writer.close();
+      })
+      .catch((error) => {
+        console.error("Error in model streaming:", error);
+        writer.close();
+      });
+
+    return new NextResponse(transformStream.readable, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Transfer-Encoding": "chunked",
+        "X-Accel-Buffering": "no",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
+  } catch (err: unknown) {
+    console.error("[/api/compare] Error:", err);
+    const message =
+      err instanceof Error ? err.message : "Internal server error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
 
 // ─── Types matching what the client sends ────────────────────────────────────
 
@@ -85,6 +170,7 @@ async function createModelStream(
   prompt: string,
   systemPrompt: string | undefined,
   attachments: AttachmentPayload[] = [],
+  openrouter: OpenAI,
 ): Promise<AsyncIterable<string>> {
   // Build messages for OpenRouter
   const messages: OpenAI.ChatCompletionMessageParam[] = [];
@@ -123,85 +209,4 @@ async function createModelStream(
   }
 
   return stringGenerator();
-}
-
-// ─── Route handler ────────────────────────────────────────────────────────────
-
-export async function POST(req: NextRequest) {
-  try {
-    const body: CompareRequestBody = await req.json();
-    const { prompt, models, systemPrompt, attachments } = body;
-
-    if (!prompt?.trim() || !models?.length) {
-      return NextResponse.json(
-        { error: "prompt and models are required" },
-        { status: 400 },
-      );
-    }
-
-    if (models.length > 10) {
-      return NextResponse.json(
-        { error: "maximum 10 models allowed for comparison" },
-        { status: 400 },
-      );
-    }
-
-    // Create multiplexed stream
-    const encoder = new TextEncoder();
-    const transformStream = new TransformStream();
-    const writer = transformStream.writable.getWriter();
-
-    // Start all model streams simultaneously
-    const modelPromises = models.map(async (model, index) => {
-      try {
-        const modelStream = await createModelStream(
-          model,
-          prompt,
-          systemPrompt,
-          attachments,
-        );
-
-        for await (const chunk of modelStream) {
-          // Prefix each chunk with model index for multiplexing
-          await writer.write(encoder.encode(`${index}:${chunk}`));
-        }
-
-        // Signal completion for this model
-        await writer.write(encoder.encode(`${index}:[DONE]`));
-      } catch (error) {
-        console.error(`Error streaming model ${model}:`, error);
-        // Send error message for this model
-        await writer.write(
-          encoder.encode(
-            `${index}:[ERROR]${error instanceof Error ? error.message : "Unknown error"}`,
-          ),
-        );
-      }
-    });
-
-    // Close stream when all models are done
-    Promise.all(modelPromises)
-      .then(() => {
-        writer.close();
-      })
-      .catch((error) => {
-        console.error("Error in model streaming:", error);
-        writer.close();
-      });
-
-    return new NextResponse(transformStream.readable, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Transfer-Encoding": "chunked",
-        "X-Accel-Buffering": "no",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-      },
-    });
-  } catch (err: unknown) {
-    console.error("[/api/compare] Error:", err);
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
 }
