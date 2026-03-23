@@ -235,9 +235,19 @@ function computeMetrics(results: { expected: string; predicted: string }[]) {
 }
 
 export async function GET(req: NextRequest) {
+  // Ensure environment variables are available
+  const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || "";
+  
+  if (!apiKey) {
+    return NextResponse.json(
+      { error: "API key not configured" },
+      { status: 500 }
+    );
+  }
+
   const openrouter = new OpenAI({
     baseURL: "https://openrouter.ai/api/v1",
-    apiKey: process.env.OPENROUTER_API_KEY!,
+    apiKey,
     defaultHeaders: {
       "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
       "X-Title": "OpenRouter Chat",
